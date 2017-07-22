@@ -14,8 +14,6 @@ def extract_user_profile_url(search_result):
     url =  soup.select_one('a.searchPersonaName').get('href')
     return url
 
-    #print(soup.prettify())
-
 def scrape_search(username, users_to_search):
     """Searches for passed username for provided number of pages and returns list of DOMs (one for each page)"""
 
@@ -59,19 +57,21 @@ def main():
         no_of_users = 20
     
     responses = scrape_search(username, no_of_users)
+    maltego = MaltegoTransform()
 
     users = []
     user_urls = []
     for resp in responses:
         users.extend(extract_user_html(resp))   
-        # Trim list to number of users specified
+    # Trim list to number of users specified
     users = users[:no_of_users]
     for user in users:
         user_urls.append(extract_user_profile_url(user))
     for url in user_urls:
-        print(url)
-    m = MaltegoTransform()
-    print(len(users))
+        #print(url)
+        maltego.addEntity('maltego.Phrase', url)
+    maltego.returnOutput()
+    #print(len(users))
 
 if __name__ == "__main__":
     main()
