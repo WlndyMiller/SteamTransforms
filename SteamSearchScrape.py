@@ -74,6 +74,7 @@ def main():
     for url in user_urls:
         output_to_maltego(url)
     MALTEGO.returnOutput()
+    
 if __name__ == "__main__":
     main()
     
