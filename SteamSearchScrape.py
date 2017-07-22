@@ -3,6 +3,7 @@
 import sys
 import dryscrape
 from bs4 import BeautifulSoup
+from MaltegoTransform import *
 
 def extract_user_profile_url(search_result):
     soup = BeautifulSoup(str(search_result), 'lxml')
@@ -56,6 +57,7 @@ def main():
         user_urls.append(extract_user_profile_url(user))
     for url in user_urls:
         print(url)
+    m = MaltegoTransform()
     print(len(users))
 
 if __name__ == "__main__":
