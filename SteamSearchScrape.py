@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 def extract_user_profile_url(search_result):
     soup = BeautifulSoup(str(search_result), 'lxml')
     url =  soup.select_one('a.searchPersonaName').get('href')
-    print("\nURL:" + url)
     return url
 
     #print(soup.prettify())
@@ -50,11 +49,13 @@ def main():
     
     responses = scrape_search(sys.argv[1], sys.argv[2])
     users = []
+    user_urls = []
     for resp in responses:
         users.extend(extract_user_html(resp))
     for user in users:
-        extract_user_profile_url(user)
-
+        user_urls.append(extract_user_profile_url(user))
+    for url in user_urls:
+        print(url)
     print(len(users))
 
 if __name__ == "__main__":
