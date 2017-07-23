@@ -17,8 +17,11 @@ def output_to_maltego(name):
 
 def extract_real_name(response):
     soup = BeautifulSoup(response, 'lxml')
-    display_name = soup.select_one('bdi').getText()
-    return display_name
+    try:
+        display_name = soup.select_one('bdi').getText()
+        return display_name
+    except AttributeError:
+        MALTEGO.addUIMessage("No public profile")
 
 def scrape_profile(url):
     ''' Returns DOM of profile URL'''
