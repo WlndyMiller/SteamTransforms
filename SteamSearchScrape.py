@@ -61,13 +61,6 @@ def scrape_search(username, users_to_search):
         session.reset()
     return search_results
 
-def scrape_profile(url):
-    ''' Returns DOM of profile URL'''
-
-    session = dryscrape.Session()
-    session.visit(url)
-    return session.body()
-
 def output_to_maltego(url, img_url, display_name):
     ''' Adds maltego entities from url '''
 
