@@ -51,7 +51,11 @@ def scrape_search(username, users_to_search):
             session.visit('/search/users/#page=' + str(i) + '&text=' + username)
         
     # Wait for search results to load
-        session.wait_for(lambda: session.at_css("div.search_row"))
+        try:
+            session.wait_for(lambda: session.at_css("div.search_row"))
+        except dryscrape.mixins.WaitTimeoutError:
+            MALTEGO.addUIMessage("No results found for user " + username)
+            output()
         search_results.append(session.body())
         # Reset session to load new page
         session.reset()
@@ -75,6 +79,10 @@ def output_to_maltego(url, img_url, display_name):
     web_entity.addAdditionalFields("title", "Title", True, profile_id)
     web_entity.addAdditionalFields("short-title", "Short Title", True, display_name)
     web_entity.setIconURL(img_url)
+
+def output():
+    MALTEGO.returnOutput()
+
 
 def main():
     if len(sys.argv) <= 2:
@@ -103,8 +111,8 @@ def main():
     else:
         for url, img_url, display_name in zip(user_urls, user_img_urls, user_display_names):
             output_to_maltego(url, img_url, display_name)
-    MALTEGO.returnOutput()
-    
+    output()
+
 if __name__ == "__main__":
     main()
     
