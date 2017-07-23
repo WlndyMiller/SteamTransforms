@@ -63,10 +63,10 @@ def output_to_maltego(url, img_url):
 
     split_url = url.split('/')
     profile_id = split_url[-1]
-    web_entity = MALTEGO.addEntity("maltego.URL", url)
-    web_entity.setType("maltego.URL")
+    web_entity = MALTEGO.addEntity("WindyMiller.SteamAccount", url)
+    web_entity.setType("WindyMiller.SteamAccount")
     web_entity.addAdditionalFields("url", "URL", True, url)
-    web_entity.addAdditionalFields("title", "Title", True, "true")
+    web_entity.addAdditionalFields("title", "Title", True, url)
     web_entity.addAdditionalFields("short-title", "Short Title", True, profile_id)
     web_entity.setIconURL(img_url)
 
