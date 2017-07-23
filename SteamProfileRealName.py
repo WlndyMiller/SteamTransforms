@@ -34,7 +34,8 @@ def main():
     url = str(sys.argv[1])
     response = scrape_profile(url)
     name = extract_real_name(response)
-    output_to_maltego(name)
+    if name:
+        output_to_maltego(name)
     output()
 
 if __name__ == "__main__":
