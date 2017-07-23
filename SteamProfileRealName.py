@@ -1,5 +1,4 @@
 import sys
-import math
 import dryscrape
 from bs4 import BeautifulSoup
 from MaltegoTransform import *
