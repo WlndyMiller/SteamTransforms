@@ -5,6 +5,7 @@ import re
 import dryscrape
 from bs4 import BeautifulSoup
 from MaltegoTransform import *
+from random import shuffle
 
 MALTEGO = MaltegoTransform()
 
@@ -70,10 +71,13 @@ def main():
     friends_list = extract_friends_list(response)
     url_list = extract_friends_profiles_url(response)
     img_url_list = extract_profile_img_url(response)
-
+    friends = []
     if len(friends_list) > 0:
         for friend, url, img_url in zip(friends_list, url_list, img_url_list):
-            output_to_maltego(friend, url,img_url)
+            friends.append({'display_name': friend, 'url': url, 'img_url': img_url})
+        shuffle(friends)
+        for friend in friends:
+            output_to_maltego(friend['display_name'], friend['url'],friend['img_url'])
     output()
 
 
