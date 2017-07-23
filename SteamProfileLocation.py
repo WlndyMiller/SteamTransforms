@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import sys
-import math
 import re
 import dryscrape
 from bs4 import BeautifulSoup
