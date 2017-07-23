@@ -15,6 +15,21 @@ def extract_user_profile_url(search_result):
     url = soup.select_one('a.searchPersonaName').get('href')
     return url
 
+def extract_user_profile_img_url(search_result):
+    '''Extracts profile image url from search result'''
+    soup = BeautifulSoup(str(search_result), 'lxml')
+    url = soup.select_one('img').get('src')
+    return url
+
+def extract_user_html(response):
+    '''Extracts each user result from page DOM'''
+    users = []
+    soup = BeautifulSoup(response, 'lxml')
+    for user in soup.select('div.search_row'):
+        users.append(str(user))
+
+    return users
+
 def scrape_search(username, users_to_search):
     """Searches for passed username for pages and returns list of DOMs"""
 
@@ -36,25 +51,24 @@ def scrape_search(username, users_to_search):
         session.reset()
     return search_results
 
-def extract_user_html(response):
-    '''Extracts each user result from page DOM'''
-    users = []
-    soup = BeautifulSoup(response, 'lxml')
-    for user in soup.select('div.search_row'):
-        users.append(str(user))
+def scrape_profile(url):
+    ''' Returns DOM of profile URL'''
 
-    return users
+    session = dryscrape.Session()
+    session.visit(url)
+    return session.body()
 
-def output_to_maltego(url):
+def output_to_maltego(url, img_url):
     ''' Adds maltego entities from url '''
     web_entity = MALTEGO.addEntity("maltego.Website", url)
     web_entity.setType("maltego.Website")
     web_entity.addAdditionalFields("fqdn", "Website", True, url)
     web_entity.addAdditionalFields("website.ssl-enabled", "SSL Enabled", True, "true")
     web_entity.addAdditionalFields("ports", "Ports", True, "443")
+    web_entity.setIconURL(img_url)
 
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) <= 2:
         sys.exit("Username and number of users to search required\nSteamSearchScrape.py \"Sample User Name\" 3")
     username = sys.argv[1]
     try:
@@ -65,14 +79,19 @@ def main():
     responses = scrape_search(username, no_of_users)
     users = []
     user_urls = []
+    user_img_urls = []
     for resp in responses:
         users.extend(extract_user_html(resp))
     # Trim list to number of users specified
     users = users[:no_of_users]
     for user in users:
         user_urls.append(extract_user_profile_url(user))
-    for url in user_urls:
-        output_to_maltego(url)
+        user_img_urls.append(extract_user_profile_img_url(user))
+    if len(user_urls) == 0:
+        MALTEGO.addUIMessage("No profiles found for " + username)
+    else:
+        for url, img_url in zip(user_urls, user_img_urls):
+            output_to_maltego(url, img_url)
     MALTEGO.returnOutput()
     
 if __name__ == "__main__":
