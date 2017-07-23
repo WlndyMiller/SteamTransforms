@@ -21,6 +21,12 @@ def extract_user_profile_img_url(search_result):
     url = soup.select_one('img').get('src')
     return url
 
+def extract_user_profile_name(search_result):
+    '''Extracts the display name from search result'''
+    soup = BeautifulSoup(str(search_result), 'lxml')
+    display_name = soup.select_one('a.searchPersonaName').getText()
+    return display_name
+
 def extract_user_html(response):
     '''Extracts each user result from page DOM'''
     users = []
@@ -58,7 +64,7 @@ def scrape_profile(url):
     session.visit(url)
     return session.body()
 
-def output_to_maltego(url, img_url):
+def output_to_maltego(url, img_url, display_name):
     ''' Adds maltego entities from url '''
 
     split_url = url.split('/')
@@ -66,8 +72,8 @@ def output_to_maltego(url, img_url):
     web_entity = MALTEGO.addEntity("WindyMiller.SteamAccount", url)
     web_entity.setType("WindyMiller.SteamAccount")
     web_entity.addAdditionalFields("url", "URL", True, url)
-    web_entity.addAdditionalFields("title", "Title", True, url)
-    web_entity.addAdditionalFields("short-title", "Short Title", True, profile_id)
+    web_entity.addAdditionalFields("title", "Title", True, profile_id)
+    web_entity.addAdditionalFields("short-title", "Short Title", True, display_name)
     web_entity.setIconURL(img_url)
 
 def main():
@@ -83,6 +89,7 @@ def main():
     users = []
     user_urls = []
     user_img_urls = []
+    user_display_names = []
     for resp in responses:
         users.extend(extract_user_html(resp))
     # Trim list to number of users specified
@@ -90,11 +97,12 @@ def main():
     for user in users:
         user_urls.append(extract_user_profile_url(user))
         user_img_urls.append(extract_user_profile_img_url(user))
+        user_display_names.append(extract_user_profile_name(user))
     if len(user_urls) == 0:
         MALTEGO.addUIMessage("No profiles found for " + username)
     else:
-        for url, img_url in zip(user_urls, user_img_urls):
-            output_to_maltego(url, img_url)
+        for url, img_url, display_name in zip(user_urls, user_img_urls, user_display_names):
+            output_to_maltego(url, img_url, display_name)
     MALTEGO.returnOutput()
     
 if __name__ == "__main__":
