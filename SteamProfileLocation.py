@@ -14,10 +14,11 @@ def output_to_maltego(location_line):
     # Split location out
     location_line_elements = re.split(r'\s{2,}', location_line)
     location_line_elements = list(filter(None, location_line_elements))
-    location = location_line_elements[-1]
+    if len(location_line_elements) > 1:
+        location = location_line_elements[-1]
 
-    location_entity = MALTEGO.addEntity("maltego.Location", location)
-    location_entity.setType("maltego.Location")
+        location_entity = MALTEGO.addEntity("maltego.Location", location)
+        location_entity.setType("maltego.Location")
 
 def scrape_profile(url):
     ''' Returns DOM of profile URL'''
